@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="275dp"
+    android:layout_height="match_parent"
+    tools:context=".WifiFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/wifiConnectLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="WIFI Network connected : N.A"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/searchWifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search WIFI Network" />
+
+        <TextView
+            android:id="@+id/availableNetworkLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="Available WIFI Network"
+            android:textSize="15sp"
+            android:textStyle="bold|italic" />
+
+
+        <ListView
+            android:id="@+id/availableWifi"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="@drawable/border"/>
+
+        <Button
+            android:id="@+id/setupArena"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WIFI set up complete" />
+    </LinearLayout>
+
+</FrameLayout>
