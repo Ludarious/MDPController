@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    tools:context=".ArenaFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="290dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/availableNetworkLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="Enter Robot's Information"
+            android:textSize="15sp"
+            android:textStyle="bold|italic" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/robotXPosLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X:" />
+
+            <EditText
+                android:id="@+id/robotXPos"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:background="@drawable/border"
+                android:inputType="phone"
+                android:layout_margin="4dp"/>
+
+
+            <TextView
+                android:id="@+id/robotYPosLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Y:"
+                android:layout_marginLeft="32dp"/>
+
+            <EditText
+                android:id="@+id/robotYPos"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:background="@drawable/border"
+                android:inputType="phone"
+                android:layout_margin="4dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/facingDirectionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Facing Direction:"
+                />
+
+            <EditText
+                android:id="@+id/facingDirection"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:background="@drawable/border"
+                android:layout_margin="4dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/initialiseRobot"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Place Robot" />
+
+    </LinearLayout>
+
+
+
+</FrameLayout>

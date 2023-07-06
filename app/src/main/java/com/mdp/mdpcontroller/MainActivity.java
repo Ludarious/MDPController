@@ -6,30 +6,33 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.content.Context;
 
+import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity{
 
-    private ListView pairedDeviceListView;
-    private ListView availableDeviceListView;
-    private TextView availableDeviceLabel;
-    private TextView pairedDeviceLabel;
+    private ListView pairedDevicesListView;
+    private ListView availableDevicesListView;
+    private BluetoothClient bluetoothClient;
 
-    private TextView transmitTextView;
+   private TextView receiveTextView;
 
 
     @Override
@@ -37,30 +40,6 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Add underline to label
-        availableDeviceLabel = (TextView)findViewById(R.id.availableDeviceLabel);
-        availableDeviceLabel.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
-
-        pairedDeviceLabel = (TextView)findViewById(R.id.pairedDeviceLabel);
-        pairedDeviceLabel.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
-
-        // Retrieve Listview
-        availableDeviceListView = findViewById(R.id.availableDevice);
-        pairedDeviceListView = findViewById(R.id.pairedDevice);
-
-        // Text View for transmission
-        transmitTextView= (TextView) findViewById(R.id.transmitTextView);
-        transmitTextView.setMovementMethod(new ScrollingMovementMethod());
-
-
-        Button btn = (Button)findViewById(R.id.setupArena);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, ArenaActivity.class));
-            }
-        });
 
         //Request permission for location
         ActivityCompat.requestPermissions(this,
@@ -68,8 +47,6 @@ public class MainActivity extends AppCompatActivity{
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_BACKGROUND_LOCATION},
                 PackageManager.PERMISSION_GRANTED);
-//        Toast.makeText(this, "Amount can not be grater than invoice",
-//                Toast.LENGTH_SHORT).show();
 
         // Enable Bluetooth
         BluetoothService bluetoothService = new BluetoothService();
@@ -78,43 +55,75 @@ public class MainActivity extends AppCompatActivity{
             bluetoothService.enableBluetooth(this);
         }
 
-        //Get Paired Devices List
+        // To get initial paired device list
+        pairedDevicesListView = findViewById(R.id.pairedDevice);
         getPairDevice();
 
 
         // Scan for bluetooth devices button
         Button scanButton = findViewById(R.id.searchBluetoothDevice);
-        //scanButton.setOnClickListener(this);
         scanButton.setOnClickListener(v -> scanNearbyDevice());
 
 
-        pairedDeviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Event Listener for choosing devices in the available list
+        availableDevicesListView = findViewById(R.id.availableDevice);
+        availableDevicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String deviceInfo = (String) parent.getItemAtPosition(position);
+                bluetoothDiscoveryService.stopDiscovery();
+                showPairingDialog(deviceInfo);
+            }
+        });
+
+        // Event Listener for choosing devices in the paired list
+
+        pairedDevicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String deviceInfo = (String) parent.getItemAtPosition(position);
                 showConnectDialog(deviceInfo);
             }
         });
 
-        availableDeviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String deviceInfo = (String) parent.getItemAtPosition(position);
-                bluetoothDiscoveryService.stopDiscovery();
-                showPairingDialog(deviceInfo);
+        // Event Listener to send text from transmit data's text view
+        // to the connected bluetooth device
+        TextView transmitTextView = (TextView) findViewById(R.id.transmitTextView);
+        Button transmitTextBtn = (Button) findViewById(R.id.transmitTextBtn);
+        transmitTextBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+               String transmitText =  transmitTextView.getText().toString();
+                bluetoothClient.sendData(transmitText);
+                transmitTextView.setText("");
+
             }
-
-
         });
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        // Pairing was successful, update paired devices list
-                        getPairDevice();
-                    }
-                }, new IntentFilter("PAIRING_SUCCESSFUL"));
 
 
+        // Initialise the receive data's text view
+        receiveTextView = findViewById(R.id.receiveTextView);
+        receiveTextView.setMovementMethod(new ScrollingMovementMethod());
+
+
+        Button setUpConfig = (Button) findViewById(R.id.setupConfiguration);
+
+        setUpConfig.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                startActivity(new Intent(MainActivity.this, ArenaActivity.class));
+            }
+        });
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(pairingBroadcastReceiver,
+                new IntentFilter("PAIRING_SUCCESSFUL"));
     }
+        private BroadcastReceiver pairingBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("PAIRING_SUCCESSFUL")) {
+                    getPairDevice();
+                }
+            }
+        };
 
 
     public void getPairDevice(){
@@ -122,15 +131,15 @@ public class MainActivity extends AppCompatActivity{
         BluetoothDiscoveryService bluetoothDiscoveryService = new BluetoothDiscoveryService(this);
         ArrayAdapter<String> pairedDevicesAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, bluetoothDiscoveryService.getPairedDevicesList());
-        pairedDeviceListView.setAdapter(pairedDevicesAdapter);
+        pairedDevicesListView.setAdapter(pairedDevicesAdapter);
     }
     private void scanNearbyDevice() {
         BluetoothDiscoveryService bluetoothDiscoveryService = new BluetoothDiscoveryService(this);
         bluetoothDiscoveryService.startDiscovery();
-        availableDeviceListView = findViewById(R.id.availableDevice);
+        availableDevicesListView = findViewById(R.id.availableDevice);
         ArrayAdapter<String> availableDevicesAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1);
-        availableDeviceListView.setAdapter(availableDevicesAdapter);
+        availableDevicesListView.setAdapter(availableDevicesAdapter);
 
         bluetoothDiscoveryService.setDiscoveryCallback(new BluetoothDiscoveryService.DiscoveryCallback() {
             @Override
@@ -142,14 +151,17 @@ public class MainActivity extends AppCompatActivity{
             public void onDiscoveryFinished() {
                 if (availableDevicesAdapter.getCount() == 0) {
                     availableDevicesAdapter.add("No devices found");
+//                    Toast.makeText(getApplicationContext(), "Error, please search again", Toast.LENGTH_SHORT).show();
                 }
                 bluetoothDiscoveryService.stopDiscovery();
-                     //   Toast.makeText(getApplicationContext(), "Search Complete", Toast.LENGTH_SHORT).show();
+//                   Toast.makeText(getApplicationContext(), "Search Complete", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
+    // Dialog box when pairing to device for the first time
+    // *Note that it will automatically be connected straight
     private void showPairingDialog(String deviceInfo) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Pairing");
@@ -159,17 +171,18 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(DialogInterface dialog, int which) {
                 String deviceAddress = deviceInfo.split("\n")[1];
                 BluetoothDiscoveryService bluetoothDiscoveryService = new BluetoothDiscoveryService(MainActivity.this);
-
-                // Pair the device first
                 bluetoothDiscoveryService.pairDevice(deviceAddress);
-                getPairDevice();
 
-//                // Connect to the device
-//                connectToPairedDevice(deviceAddress);
+              // Remove the device from the available devices list
+                ArrayAdapter<String> availableDevicesAdapter =
+                        (ArrayAdapter<String>)availableDevicesListView.getAdapter();
+                availableDevicesAdapter.remove(deviceInfo);
+
+                getPairDevice();
                 dialog.dismiss();
 
-
             }
+
         });
 
 
@@ -182,6 +195,7 @@ public class MainActivity extends AppCompatActivity{
 
         AlertDialog alert = builder.create();
         alert.show();
+
     }
 
     private void showConnectDialog(String deviceInfo) {
@@ -193,8 +207,7 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(DialogInterface dialog, int which) {
                 String deviceAddress = deviceInfo.split("\n")[1];
                 BluetoothDiscoveryService bluetoothDiscoveryService = new BluetoothDiscoveryService(MainActivity.this);
-
-                connectToPairedDevice(deviceAddress);
+                connectToBluetoothDevice(deviceAddress);
                 dialog.dismiss();
 
 
@@ -213,10 +226,28 @@ public class MainActivity extends AppCompatActivity{
         alert.show();
     }
 
-    public void connectToPairedDevice(String deviceAddress) {
-        BluetoothDiscoveryService bluetoothDiscoveryService = new BluetoothDiscoveryService(this);
-       bluetoothDiscoveryService.pairDevice(deviceAddress);
-        bluetoothDiscoveryService.connectToDevice(deviceAddress);
+    private void connectToBluetoothDevice(String deviceAddress) {
+        bluetoothClient = new BluetoothClient(deviceAddress, this, new BluetoothClient.BluetoothCallback() {
+            @Override
+            public void onBluetoothDataReceived(final String data) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // This code will run on the UI thread
+                        receiveTextView.append(data + "\n");
+
+                    }
+                });
+            }
+        });
+        bluetoothClient.start();
+
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pairingBroadcastReceiver);
+    }
 }

@@ -27,82 +27,207 @@
 
             <LinearLayout
                 android:id="@+id/leftLinear"
-                android:layout_width="600dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/transmitDataLabel"
+                    android:id="@+id/arenaLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/receiveDataLabel"
                     android:fontFamily="sans-serif"
-                    android:text="Transmit Data"
+                    android:text="Arena"
                     android:textSize="20sp" />
 
-                <EditText
-                    android:id="@+id/transmitTextView"
-                    android:layout_width="600dp"
-                    android:layout_height="190dp"
+                <TextView
+                    android:layout_width="671dp"
+                    android:layout_height="410dp"
                     android:background="@drawable/border"
                     android:maxLines="10"
                     android:scrollbars="vertical"
                     android:textColor="#232e3b"
                     android:typeface="sans" />
 
-                <TextView
-                    android:id="@+id/receiveDataLabel"
-                    android:layout_width="wrap_content"
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rightPane">
+
+            <LinearLayout
+                android:id="@+id/upperRightPane"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+
+                android:orientation="vertical">
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal">-->
+<!--                    <TextView-->
+<!--                        android:id="@+id/wifiConnectLabel"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:fontFamily="sans-serif"-->
+<!--                        android:layout_marginTop="3dp"-->
+<!--                        android:text="1. Set up Wifi "-->
+<!--                        android:textSize="25sp"-->
+<!--                        android:textStyle="bold|italic"/>-->
+
+<!--                    <Button-->
+<!--                        android:id="@+id/configureWifi"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginLeft="4dp"-->
+<!--                        android:text="Configure" />-->
+<!--                </LinearLayout>-->
+
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal">-->
+<!--                    <TextView-->
+<!--                        android:id="@+id/arenaSetupLabel"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:fontFamily="sans-serif"-->
+<!--                        android:layout_marginTop="3dp"-->
+<!--                        android:text="Set up Arena "-->
+<!--                        android:textSize="25sp"-->
+<!--                        android:textStyle="bold|italic"/>-->
+
+<!--                    <Button-->
+<!--                        android:id="@+id/configureArena"-->
+<!--                        android:layout_marginLeft="4dp"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Configure" />-->
+<!--                </LinearLayout>-->
+
+                <LinearLayout
+                    android:id="@+id/robotInformationLayout"
+                    android:layout_width="289dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="Receive Data"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/receiveTextView"
-                    android:layout_width="600dp"
-                    android:layout_height="190dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/border"
-                    android:maxLines="10"
-                    android:scrollbars="vertical"
-                    android:textColor="#232e3b"
-                    android:typeface="sans" />
+                    android:orientation="vertical">
 
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                        android:fontFamily="sans-serif"
+                        android:text="Enter Robot's Information"
+                        android:textSize="20sp"
+                        android:textStyle="bold|italic" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_margin="6dp"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/robotXPosLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="X:"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/robotXPos"
+                            android:layout_width="50dp"
+                            android:layout_height="30dp"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/border"
+                            android:inputType="phone" />
+
+
+                        <TextView
+                            android:id="@+id/robotYPosLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="32dp"
+                            android:layout_marginTop="4dp"
+                            android:text="Y:"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/robotYPos"
+                            android:layout_width="50dp"
+                            android:layout_height="30dp"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/border"
+                            android:inputType="phone" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_margin="6dp"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/facingDirectionLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Facing Direction:"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/facingDirection"
+                            android:layout_width="50dp"
+                            android:layout_height="30dp"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/border" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/initialiseRobot"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                        android:text="Place Robot" />
+
+                </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/setupComplete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="167dp"
+                    android:text="Set Up Complete" />
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/transmitText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="175dp"
-                    android:layout_marginLeft="5dp"
-                    android:text="send" />
+                android:orientation="horizontal"
+                android:id="@+id/belowRightPane">
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="275dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:orientation="vertical">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragmentContainerView2"
-                android:name="com.mdp.mdpcontroller.WifiFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout="@layout/fragment_wifi" />
-        </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 </RelativeLayout>

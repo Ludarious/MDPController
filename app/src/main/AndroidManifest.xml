@@ -27,9 +27,12 @@
         android:theme="@style/Theme.MDPController"
         tools:targetApi="31">
         <activity
+            android:name=".ManualControlFragment"
+            android:exported="false" />
+        <activity
             android:name=".ArenaActivity"
             android:exported="false"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -9,35 +9,27 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.Manifest;
-import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.UUID;
+
 
 public class BluetoothDiscoveryService {
     private final BluetoothAdapter bluetoothAdapter;
     private final Context context;
     private ArrayList<String> newDevicesList = new ArrayList<>();
     private ArrayList<String> pairedDevicesList = new ArrayList<>();
-
     private DiscoveryCallback callback;
-    private BluetoothSocket bluetoothSocket;
-    private BluetoothDevice bluetoothDevice;
+
 
     public BluetoothDiscoveryService(Context context) {
         this.context = context;
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         registerReceivers();
     }
-    //    public BluetoothDiscoveryService() {
-//        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//        //registerReceivers();
-//    }
+
     @SuppressWarnings("MissingPermission")
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -114,9 +106,6 @@ public class BluetoothDiscoveryService {
     }
 
 
-    public ArrayList<String> getNewDevicesList() {
-        return newDevicesList;
-    }
 
     @SuppressWarnings("MissingPermission")
     public void stopDiscovery() {
@@ -144,43 +133,6 @@ public class BluetoothDiscoveryService {
 
         }
     }
-
-    @SuppressWarnings("MissingPermission")
-    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
-        return device.createRfcommSocketToServiceRecord(uuid);
-    }
-    @SuppressWarnings("MissingPermission")
-    public void connectToDevice(String deviceAddress) {
-        if (BluetoothAdapter.checkBluetoothAddress(deviceAddress)) {
-            bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
-            BluetoothSocket socket;
-
-            try {
-                socket = createBluetoothSocket(bluetoothDevice);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d("connectToDevice", "createBluetoothSocket Catch");
-                return;
-            }
-
-            // Establish the Bluetooth socket connection.
-            try {
-                socket.connect();
-                bluetoothSocket = socket; // save the connected socket
-            } catch (IOException e) {
-                Log.d("connectToDevice", "socket.connect() 1st try catch");
-                try {
-                    socket.close();
-                    Log.d("connectToDevice", "socket.closed");
-                } catch (IOException e2) {
-                    // Show some toast or notification about the exception
-                    Log.d("connectToDevice", "socket.connect() 2nd try catch");
-                }
-            }
-        }
-    }
-
 
 
 }
