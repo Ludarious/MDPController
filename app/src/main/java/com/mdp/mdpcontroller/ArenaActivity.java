@@ -1,19 +1,28 @@
 package com.mdp.mdpcontroller;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class ArenaActivity extends AppCompatActivity {
+    BluetoothClient bluetoothClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arena);
+        if (!MainActivity.bluetoothClient.isInterrupted()){
+            bluetoothClient = MainActivity.bluetoothClient;
+        }
+
 
 
 //        Button configureWifi = (Button) findViewById(R.id.configureWifi);
@@ -51,11 +60,11 @@ public class ArenaActivity extends AppCompatActivity {
 
                 //Replace belowRightPane with Control Robot Fragment
                 ControlRobotFragment controlRobot = new ControlRobotFragment();
+
+
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.belowRightPane, controlRobot)
                         .commit();
-
-
             }
         });
     }

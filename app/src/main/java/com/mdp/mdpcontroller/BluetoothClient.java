@@ -29,8 +29,17 @@ public class BluetoothClient extends Thread {
     private final String pairdeviceAddress;
     private String timeStamp;
     private BluetoothCallback callback;
+    private static BluetoothClient bluetoothClientInstance = null;
 
-    public BluetoothClient(String pairdeviceAddress,Context context, BluetoothCallback callback) {
+    // Method to get the singleton instance of BluetoothClient
+    public static synchronized BluetoothClient getInstance(String pairdeviceAddress, Context context, BluetoothCallback callback) {
+        if (bluetoothClientInstance == null) {
+            bluetoothClientInstance = new BluetoothClient(pairdeviceAddress, context, callback);
+        }
+        return bluetoothClientInstance;
+    }
+
+    private BluetoothClient(String pairdeviceAddress,Context context, BluetoothCallback callback) {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(pairdeviceAddress);
         this.context = context;

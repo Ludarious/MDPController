@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity{
 
     private ListView pairedDevicesListView;
     private ListView availableDevicesListView;
-    private BluetoothClient bluetoothClient;
+    public static BluetoothClient bluetoothClient = null;
 
    private TextView receiveTextView;
 
@@ -109,7 +109,13 @@ public class MainActivity extends AppCompatActivity{
 
         setUpConfig.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                startActivity(new Intent(MainActivity.this, ArenaActivity.class));
+                if(bluetoothClient == null){
+                    Toast.makeText(getApplicationContext(), "Bluetooth Connection Not Established", Toast.LENGTH_SHORT).show();
+
+                }else {
+                    startActivity(new Intent(MainActivity.this, ArenaActivity.class));
+
+                }
             }
         });
 
@@ -227,21 +233,26 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void connectToBluetoothDevice(String deviceAddress) {
-        bluetoothClient = new BluetoothClient(deviceAddress, this, new BluetoothClient.BluetoothCallback() {
+
+        // Initialize your BluetoothClient
+        BluetoothClient.BluetoothCallback callback = new BluetoothClient.BluetoothCallback() {
             @Override
-            public void onBluetoothDataReceived(final String data) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // This code will run on the UI thread
-                        receiveTextView.append(data + "\n");
+                public void onBluetoothDataReceived(final String data) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // This code will run on the UI thread
+                            receiveTextView.append(data + "\n");
 
-                    }
-                });
-            }
-        });
+                        }
+                    });
+                }
+        };
+
+        // Using singleton to initialise an object
+        bluetoothClient = BluetoothClient.getInstance(deviceAddress, this, callback);
+
         bluetoothClient.start();
-
     }
 
     @Override
