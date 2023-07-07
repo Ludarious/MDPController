@@ -6,12 +6,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,8 +39,11 @@ public class ControlRobotFragment extends Fragment implements BluetoothClient.Bl
     private String mParam2;
 
     private TextView    logWindowTextArea;
+    private LinearLayout controllerLayout;
     private BluetoothClient bluetoothClient;
 
+    Spinner spinner;
+    private ImageButton arrowUpBtn, arrowLeftBtn, arrowRightBtn, arrowDownBtn;
 
     public ControlRobotFragment() {
         // Required empty public constructor
@@ -79,23 +86,36 @@ public class ControlRobotFragment extends Fragment implements BluetoothClient.Bl
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_control_robot, container, false);
         logWindowTextArea = (TextView) view.findViewById(R.id.editTextTextMultiLine);  // Assume you have a TextView in your XML with this id
-
+        logWindowTextArea.setMovementMethod(new ScrollingMovementMethod());
+        controllerLayout = view.findViewById(R.id.manualControlLayout);
+        arrowUpBtn = (ImageButton) view.findViewById(R.id.upArrow);
+        arrowLeftBtn = (ImageButton) view.findViewById(R.id.leftArrow);
+        arrowRightBtn = (ImageButton) view.findViewById(R.id.rightArrow);
+        arrowDownBtn = (ImageButton) view.findViewById(R.id.downArrow);
+        spinner = view.findViewById(R.id.controlDropDownList);
         return view;
-    }
-    public TextView getMyTextView() {
-        return logWindowTextArea;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Spinner spinner = view.findViewById(R.id.controlDropDownList);
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedOption = parent.getItemAtPosition(position).toString();
+//                LinearLayout controllerLayout = view.findViewById(R.id.manualControlLayout);
               //  Toast.makeText(parent.getContext(), selectedOption, Toast.LENGTH_SHORT).show();
+                if (selectedOption.equals("Manual")){
+
+                    controllerLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    controllerLayout.setVisibility(View.GONE);
+                }
+
+
             }
 
             @Override
@@ -104,28 +124,46 @@ public class ControlRobotFragment extends Fragment implements BluetoothClient.Bl
             }
         });
 
-//        TextView displayLogText = view.findViewById(R.id.editTextTextMultiLine);
-//        Button sendTextButton = view.findViewById(R.id.sendTxt);
-//        sendTextButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (bluetoothClient != null) {
-//                    String textToSend = editText.getText().toString();
-//                    bluetoothClient.sendData(textToSend);
-//                } else {
-//                    Toast.makeText(getContext(), "Bluetooth client is not initialized", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
+
+        arrowUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Do something here when the button is clicked
+                Log.d("ControlRobotFragment", "Up arrow button clicked");
+                bluetoothClient.sendData("mf");
+            }
+        });
+
+        arrowLeftBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Do something here when the button is clicked
+                Log.d("ControlRobotFragment", "Left arrow button clicked");
+                bluetoothClient.sendData("ml");
+            }
+        });
+
+        arrowRightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Do something here when the button is clicked
+                Log.d("ControlRobotFragment", "Right arrow button clicked");
+                bluetoothClient.sendData("mr");
+            }
+        });
+
+        arrowDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Do something here when the button is clicked
+                Log.d("ControlRobotFragment", "Down arrow button clicked");
+                bluetoothClient.sendData("md");
+            }
+        });
     }
 
     @Override
     public void onBluetoothDataReceived(String data) {
-        // Here you'll receive the data from the Bluetooth connection.
-        // Update your TextView with the received data.
-        // Because this method will be called from a background thread,
-        // make sure you post it to the main thread
-
         if (getActivity() != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -133,6 +171,25 @@ public class ControlRobotFragment extends Fragment implements BluetoothClient.Bl
                     logWindowTextArea.append(data + "\n");  // Append the received data to the existing data in the TextView.
                 }
             });
+        }
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("onStart", "At controlrobotfragment");
+        if (MainActivity.bluetoothClient != null) {
+            bluetoothClient = MainActivity.bluetoothClient;
+            bluetoothClient.registerCallback(this);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (bluetoothClient != null) {
+            bluetoothClient.unregisterCallback();
         }
     }
 

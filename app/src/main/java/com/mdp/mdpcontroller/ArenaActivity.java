@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,12 +15,14 @@ import android.widget.TextView;
 
 public class ArenaActivity extends AppCompatActivity {
     BluetoothClient bluetoothClient;
+    ControlRobotFragment controlRobotFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arena);
         if (!MainActivity.bluetoothClient.isInterrupted()){
+            Log.d("bluetoothclient", "mainactivity.bleutoothclient intialise");
             bluetoothClient = MainActivity.bluetoothClient;
         }
 
@@ -67,5 +70,21 @@ public class ArenaActivity extends AppCompatActivity {
                         .commit();
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (bluetoothClient != null && controlRobotFragment != null) {
+            bluetoothClient.unregisterCallback();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (bluetoothClient != null && controlRobotFragment != null) {
+            bluetoothClient.registerCallback(controlRobotFragment);
+        }
     }
 }

@@ -26,7 +26,7 @@ import android.widget.Toast;
 import android.content.Context;
 
 import java.util.ArrayList;
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private ListView pairedDevicesListView;
     private ListView availableDevicesListView;
@@ -233,28 +233,58 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void connectToBluetoothDevice(String deviceAddress) {
-
-        // Initialize your BluetoothClient
+        // Initialize BluetoothClient callback
         BluetoothClient.BluetoothCallback callback = new BluetoothClient.BluetoothCallback() {
             @Override
+            public void onBluetoothDataReceived(final String data) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // This code will run on the UI thread
+                        receiveTextView.append(data + "\n");
+                    }
+                });
+            }
+        };
+
+        // Using singleton to initialise an object
+        bluetoothClient = BluetoothClient.getInstance(deviceAddress, this, callback);
+        bluetoothClient.registerCallback(callback);
+        bluetoothClient.start();
+        Log.d("after .start()", String.valueOf(bluetoothClient));
+    }
+    protected void onPause() {
+        super.onPause();
+        if (bluetoothClient != null ) {
+            bluetoothClient.unregisterCallback();
+        }
+    }
+
+    protected void onResume() {
+        super.onResume();
+        Log.d("bluetoothCLient is null or not ", String.valueOf(bluetoothClient));
+        if (bluetoothClient != null) {
+            // Re-initialize BluetoothClient callback
+            BluetoothClient.BluetoothCallback callback = new BluetoothClient.BluetoothCallback() {
+                @Override
                 public void onBluetoothDataReceived(final String data) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             // This code will run on the UI thread
                             receiveTextView.append(data + "\n");
-
                         }
                     });
                 }
-        };
-
-        // Using singleton to initialise an object
-        bluetoothClient = BluetoothClient.getInstance(deviceAddress, this, callback);
-
-        bluetoothClient.start();
+            };
+            bluetoothClient.registerCallback(callback);
+        }
     }
 
+
+//    public void onBluetoothDataReceived(final String data) {
+//        runOnUiThread(() -> receiveTextView.append(data + "\n"));
+//    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -13,10 +13,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class BluetoothClient extends Thread {
+
+    // List of registered callbacks
+    private static BluetoothClient instance = null;
+
 
     private static final UUID APP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String TAG = "BluetoothClient";
@@ -29,14 +35,13 @@ public class BluetoothClient extends Thread {
     private final String pairdeviceAddress;
     private String timeStamp;
     private BluetoothCallback callback;
-    private static BluetoothClient bluetoothClientInstance = null;
 
-    // Method to get the singleton instance of BluetoothClient
-    public static synchronized BluetoothClient getInstance(String pairdeviceAddress, Context context, BluetoothCallback callback) {
-        if (bluetoothClientInstance == null) {
-            bluetoothClientInstance = new BluetoothClient(pairdeviceAddress, context, callback);
+    public static synchronized BluetoothClient getInstance(String deviceAddress, Context context, BluetoothCallback callback) {
+        if (instance == null) {
+            instance = new BluetoothClient(deviceAddress, context, callback);
+            instance.registerCallback(callback);
         }
-        return bluetoothClientInstance;
+        return instance;
     }
 
     private BluetoothClient(String pairdeviceAddress,Context context, BluetoothCallback callback) {
@@ -211,7 +216,7 @@ public class BluetoothClient extends Thread {
                     // Handle the case when all retries fail here. For example, you can show a Toast message to inform the user.
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(context, "Reconnecting...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Reconnecting to device...", Toast.LENGTH_SHORT).show();
                                 return;
 //                            Toast.makeText(context, "Unable to reconnect after " + maxRetryCount + " attempts", Toast.LENGTH_SHORT).show();
 //                            progressDialog.dismiss();  //dismiss progressDialog here
@@ -268,6 +273,17 @@ public class BluetoothClient extends Thread {
     public interface BluetoothCallback {
         void onBluetoothDataReceived(String data);
     }
+
+    // Method to register a callback
+
+    public void registerCallback(BluetoothCallback callback) {
+        this.callback = callback;
+    }
+
+    public void unregisterCallback() {
+        this.callback = null;
+    }
+
 
 
 }
